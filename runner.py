@@ -3,21 +3,30 @@ import re
 import os
 
 books = [
-    {"numOfChapters": 22, "title": "1 Nephi", "uri": "1-ne"},
-    {"numOfChapters": 33, "title": "2 Nephi", "uri": "2-ne"},
-    {"numOfChapters": 7, "title": "Jacob", "uri": "jacob"},
-    {"numOfChapters": 1, "title": "Enos", "uri": "enos"},
-    {"numOfChapters": 1, "title": "Jarom", "uri": "jarom"},
-    {"numOfChapters": 1, "title": "Omni", "uri": "omni"},
-    {"numOfChapters": 1, "title": "Words of Mormon", "uri": "w-of-m"},
-    {"numOfChapters": 29, "title": "Mosiah", "uri": "mosiah"},
-    {"numOfChapters": 63, "title": "Alma", "uri": "alma"},
-    {"numOfChapters": 16, "title": "Helaman", "uri": "hel"},
-    {"numOfChapters": 30, "title": "3 Nephi", "uri": "3-ne"},
-    {"numOfChapters": 1, "title": "4 Nephi", "uri": "4-ne"},
-    {"numOfChapters": 9, "title": "Mormon", "uri": "morm"},
-    {"numOfChapters": 15, "title": "Ether", "uri": "ether"},
-    {"numOfChapters": 10, "title": "Moroni", "uri": "moro"}
+    {"numOfChapters": 22, "title": "1-nephi", "uri": "1-ne"},
+    {"numOfChapters": 33, "title": "2-nephi", "uri": "2-ne"},
+    {"numOfChapters": 7, "title": "jacob", "uri": "jacob"},
+    {"numOfChapters": 1, "title": "enos", "uri": "enos"},
+    {"numOfChapters": 1, "title": "jarom", "uri": "jarom"},
+    {"numOfChapters": 1, "title": "omni", "uri": "omni"},
+    {"numOfChapters": 1, "title": "words-of-mormon", "uri": "w-of-m"},
+    {"numOfChapters": 29, "title": "mosiah", "uri": "mosiah"},
+    {"numOfChapters": 63, "title": "alma", "uri": "alma"},
+    {"numOfChapters": 16, "title": "helaman", "uri": "hel"},
+    {"numOfChapters": 30, "title": "3-nephi", "uri": "3-ne"},
+    {"numOfChapters": 1, "title": "4-nephi", "uri": "4-ne"},
+    {"numOfChapters": 9, "title": "mormon", "uri": "morm"},
+    {"numOfChapters": 15, "title": "ether", "uri": "ether"},
+    {"numOfChapters": 10, "title": "moroni", "uri": "moro"}
+]
+
+languages=[
+    {"code":"eng","full-eng-title":"english"},
+    {"code":"spa","full-eng-title":"spanish"},
+    {"code":"fra","full-eng-title":"french"},
+    {"code":"por","full-eng-title":"portugese"},
+    {"code":"ita","full-eng-title":"italian"},
+    {"code":"deu","full-eng-title":"german"},
 ]
 
 
@@ -28,7 +37,7 @@ def writeLinesToFile(lines, path):
 
 def getData(language,book,chapter):
     base_url = "https://www.churchofjesuschrist.org/study/api/v3/language-pages/type/content?lang={}&uri=/scriptures/bofm/{}/{}"  #https://www.churchofjesuschrist.org/study/api/v3/language-pages/type/content?lang=spa&uri=/scriptures/bofm/1-ne/5
-    url = base_url.format(language, book, chapter) 
+    url = base_url.format(language["code"], book["uri"], chapter) 
     print(url)
 
     response = requests.get(url)
@@ -47,15 +56,14 @@ def getData(language,book,chapter):
         verses=verses[1:] #get rid of chapter description
         #verses[0]=verses[0].split("\n")[2]+"\n" #this line of code sometimes shows the chapter description, sometimes not
 
-        writeLinesToFile(verses,"bom/bom-"+language+"/"+book+"/"+chapter+".txt")
+        writeLinesToFile(verses,"bom/bom-"+language["full-eng-title"]+"/"+book["title"]+"/"+chapter+".txt")
     else:
         print("Failed to retrieve data. Status code:", response.status_code)
 
 def writeBOM(language):
     for book in books:
         for chapter in range(1, int(book["numOfChapters"])+1):
-            getData(language,book["uri"],str(chapter))
+            getData(language,book,str(chapter))
 
-langs=["por","spa","fra","ita","deu"]
-for lang in langs:
+for lang in languages:
     writeBOM(lang)
